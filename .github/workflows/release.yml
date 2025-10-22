@@ -80,21 +80,11 @@ jobs:
           sed -i "s/^version:.*/version: $VERSION/" Chart.yaml
           cat Chart.yaml | grep "version:"
 
-      - name: Package Helm chart
-        run: |
-          helm package .
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            *.tgz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.5.0
+        uses: helm/chart-releaser-action@v1.6.0
         with:
           charts_dir: .
+          skip_existing: false
+          mark_as_latest: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
