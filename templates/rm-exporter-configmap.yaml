@@ -1,0 +1,46 @@
+{{- if and .Values.azureResourceManagerExporter.enabled .Values.azureResourceManagerExporter.additionalResources.configMap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.name }}
+  namespace: {{ include "monitoring-stack.namespace" . }}
+  labels:
+    {{- include "monitoring-stack.labels" . | nindent 4 }}
+    component: azure-resourcemanager-exporter
+data:
+  config.yml: |
+    azure:
+      {{- if .Values.azureResourceManagerExporter.additionalResources.configMap.data.azure.resourceTags }}
+      resourceTags:
+        {{- toYaml .Values.azureResourceManagerExporter.additionalResources.configMap.data.azure.resourceTags | nindent 8 }}
+      {{- else }}
+      resourceTags: []
+      {{- end }}
+      {{- if .Values.azureResourceManagerExporter.additionalResources.configMap.data.azure.resourceGroupTags }}
+      resourceGroupTags:
+        {{- toYaml .Values.azureResourceManagerExporter.additionalResources.configMap.data.azure.resourceGroupTags | nindent 8 }}
+      {{- else }}
+      resourceGroupTags: []
+      {{- end }}
+    collectors:
+      general:
+        scrapeTime: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.general.scrapeTime }}
+      costs:
+        scrapeTime: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.costs.scrapeTime }}
+        queries:
+          {{- toYaml .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.costs.queries | nindent 10 }}
+      graph:
+        scrapeTime: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.graph.scrapeTime }}
+        filter:
+          application: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.graph.filter.application | quote }}
+          servicePrincipal: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.graph.filter.servicePrincipal | quote }}
+      defender:
+        scrapeTime: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.defender.scrapeTime }}
+      resourceHealth:
+        scrapeTime: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.resourceHealth.scrapeTime }}
+        summaryMaxLength: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.resourceHealth.summaryMaxLength }}
+      reservation:
+        scrapeTime: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.reservation.scrapeTime }}
+        granularity: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.reservation.granularity }}
+        fromDays: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.reservation.fromDays }}
+{{- end }}

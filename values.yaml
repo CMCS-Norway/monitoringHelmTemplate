@@ -1,0 +1,514 @@
+# Global configuration
+global:
+  # Namespace where all resources will be deployed
+  namespace: monitoring
+  
+  # Customer identifier used in labels
+  customer: "customer"
+  customerLabel: "Customer Name"
+  
+  # Platform labels
+  platform: "cloud"
+  provider: "azure"
+  
+  # Azure authentication secrets
+  azureSecrets:
+    enabled: true
+    # ExternalSecret configuration for Azure credentials
+    externalSecret:
+      name: azure-config
+      refreshInterval: 12h
+      secretStoreRef:
+        kind: ClusterSecretStore
+        name: azure-backend
+      # Remote keys for Azure credentials
+      remoteKeys:
+        clientId: azure-client-id
+        clientSecret: azure-client-secret
+        tenantId: azure-tenant-id
+        logAnalyticsWorkspace: azure-la-workspace-id
+        subscriptionId: azure-subscription-id
+
+# Azure KeyVault Exporter configuration
+# This section passes values to the webdevops/azure-keyvault-exporter chart
+azureKeyVaultExporter:
+  enabled: true
+  
+  fullnameOverride: "azure-kv-exporter"
+  
+  replicas: 1
+  minReadySeconds: 10
+  terminationGracePeriodSeconds: 60
+  
+  env:
+    AZURE_ENVIRONMENT: "AZUREPUBLICCLOUD"
+    AZURE_SUBSCRIPTION_ID: "56d65446-19e8-4e57-b555-67acddcbee07 e86405b6-ff44-4802-9df0-d0d2cc075aad"
+    KEYVAULT_FILTER: "where tags['monitoring'] == 'true'"
+  
+  extraEnv:
+    - name: AZURE_TENANT_ID
+      valueFrom:
+        secretKeyRef:
+          name: azure-kv-config
+          key: AZURE_TENANT_ID
+    - name: AZURE_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: azure-kv-config
+          key: AZURE_CLIENT_SECRET
+    - name: AZURE_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: azure-kv-config
+          key: AZURE_CLIENT_ID
+  
+  secretsEnableTemplateFunctions: false
+  secrets: {}
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      memory: 200Mi
+  
+  nodeSelector:
+    kubernetes.io/os: linux
+  
+  affinity: {}
+  tolerations: []
+  
+  restartPolicy: Always
+  priorityClassName: ""
+  
+  config: ""
+  
+  startupProbe:
+    tcpSocket:
+      port: http-metrics
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    failureThreshold: 5
+  
+  livenessProbe:
+    tcpSocket:
+      port: http-metrics
+    initialDelaySeconds: 15
+    periodSeconds: 30
+    failureThreshold: 5
+  
+  readinessProbe:
+    tcpSocket:
+      port: http-metrics
+    initialDelaySeconds: 15
+    periodSeconds: 30
+    failureThreshold: 5
+  
+  serviceAccount:
+    create: true
+    name: azure-keyvault-exporter
+    labels: {}
+    annotations: {}
+  
+  strategy: {}
+  
+  podLabels: {}
+  podAnnotations: {}
+  
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    supplementalGroups: [1000]
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  
+  containerSecurityContext:
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+  
+  imagePullSecrets: []
+  
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+    appProtocol: http
+    nodePort:
+    portName: http-metrics
+    annotations: {}
+    labels: {}
+  
+  netpol:
+    enabled: false
+    policyTypes:
+      - Ingress
+      - Egress
+    ingress: []
+    egress:
+      # DNS
+      - ports:
+          - port: 53
+            protocol: TCP
+      - ports:
+          - port: 53
+            protocol: UDP
+      # HTTPS (Azure REST api)
+      - ports:
+          - port: 443
+            protocol: TCP
+  
+  prometheus:
+    monitor:
+      enabled: true
+      jobLabel: ""
+      relabelings:
+        - action: replace
+          targetLabel: namespace
+          replacement: monitoring
+        - action: replace
+          targetLabel: application
+          replacement: kv-exporter
+        - action: replace
+          targetLabel: customer
+          replacement: "Customer Name"
+        - action: replace
+          targetLabel: platform
+          replacement: cloud
+        - action: replace
+          targetLabel: provider
+          replacement: azure
+        - action: replace
+          targetLabel: type
+          replacement: serviceMonitor
+      metricRelabelings: []
+      interval: ""
+      scrapeTimeout: ""
+      sampleLimit: 0
+      targetLimit: 0
+      labelLimit: 0
+      labelNameLengthLimit: 0
+      labelValueLengthLimit: 0
+  
+  # Additional resources specific to KeyVault Exporter
+  additionalResources:
+    # Create ExternalSecret for KeyVault exporter credentials
+    externalSecret:
+      enabled: true
+      name: azure-kv-config
+      refreshInterval: 12h
+      secretStoreRef:
+        kind: ClusterSecretStore
+        name: azure-backend
+      remoteKeys:
+        clientId: azure-client-id
+        clientSecret: azure-client-secret
+        tenantId: azure-tenant-id
+    
+    # Optional ScrapeConfig (currently commented in original)
+    scrapeConfig:
+      enabled: false
+      name: azure-keyvault-exporter
+      jobName: azure-kv-exporter
+      metricsPath: /metrics
+      scrapeInterval: 1m
+      scrapeTimeout: 30s
+
+# Azure Resource Manager Exporter configuration
+# This section passes values to the webdevops/azure-resourcemanager-exporter chart
+azureResourceManagerExporter:
+  enabled: true
+  
+  fullnameOverride: azure-resourcemanager-exporter
+  
+  image:
+    registry: docker.io
+    repository: webdevops/azure-resourcemanager-exporter
+    tag: "25.5.1"
+  
+  env:
+    AZURE_ENVIRONMENT: AZUREPUBLICCLOUD
+    CONFIG: "config/config.yml"
+  
+  extraEnv:
+    - name: AZURE_TENANT_ID
+      valueFrom:
+        secretKeyRef:
+          name: azure-config
+          key: AZURE_TENANT_ID
+    - name: AZURE_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: azure-config
+          key: AZURE_CLIENT_SECRET
+    - name: AZURE_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: azure-config
+          key: AZURE_CLIENT_ID
+  
+  existingConfigMap: "resourcemanager-exporter-cm"
+  
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 200m
+  
+  netpol:
+    enabled: false
+  
+  prometheus:
+    monitor:
+      enabled: false
+      jobLabel: ""
+      scheme: http
+      relabelings:
+        - action: replace
+          targetLabel: namespace
+          replacement: monitoring
+        - action: replace
+          targetLabel: application
+          replacement: rm-exporter
+        - action: replace
+          targetLabel: customer
+          replacement: "Customer Name"
+        - action: replace
+          targetLabel: platform
+          replacement: cloud
+        - action: replace
+          targetLabel: provider
+          replacement: azure
+        - action: replace
+          targetLabel: type
+          replacement: serviceMonitor
+  
+  # Additional resources specific to Resource Manager Exporter
+  additionalResources:
+    # ConfigMap for Resource Manager exporter configuration
+    configMap:
+      enabled: true
+      name: resourcemanager-exporter-cm
+      data:
+        azure:
+          resourceTags: []
+          resourceGroupTags: []
+        collectors:
+          general:
+            scrapeTime: 24h
+          costs:
+            scrapeTime: 24h
+            queries:
+              - name: by_subscriptions
+                timeFrames: [MonthToDate]
+                valueField: PreTaxCost
+                subscriptions: []
+          graph:
+            scrapeTime: 24h
+            filter:
+              application: ""
+              servicePrincipal: ""
+          defender:
+            scrapeTime: 24h
+          resourceHealth:
+            scrapeTime: 24h
+            summaryMaxLength: 0
+          reservation:
+            scrapeTime: 24h
+            granularity: monthly
+            fromDays: 30
+
+# Fortigate Exporter configuration
+# This is a custom deployment (not a Helm dependency)
+fortigateExporter:
+  enabled: true
+  
+  name: fortigate-exporter
+  
+  image:
+    registry: ghcr.io
+    repository: cmcs-norway/fortigate-exporter-image
+    tag: "v3.0.0"
+    pullPolicy: IfNotPresent
+  
+  replicas: 1
+  
+  # Container configuration
+  containerPort: 9710
+  
+  args:
+    - "-auth-file"
+    - "/config/fortigate-key.yaml"
+    - "-insecure"
+  
+  # Volume mount configuration
+  volumeMounts:
+    - mountPath: /config/fortigate-key.yaml
+      subPath: "fortigate-key.yaml"
+      name: config-volume
+      readOnly: true
+  
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 200m
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 9710
+    protocol: TCP
+  
+  # ExternalSecret configuration
+  externalSecret:
+    enabled: true
+    name: fortigate-config
+    refreshInterval: 12h
+    secretStoreRef:
+      kind: ClusterSecretStore
+      name: azure-backend
+    targetSecretName: fortigate-exporter-config
+    remoteKey: fortigate-config
+    secretKey: fortigate-key.yaml
+  
+  # ScrapeConfig for Fortigate firewalls
+  scrapeConfig:
+    enabled: true
+    name: fortigate-exporter
+    jobName: fortigate_exporter
+    metricsPath: /probe
+    scrapeInterval: 5m
+    scrapeTimeout: 30s
+    
+    # List of Fortigate firewall targets
+    targets:
+      - https://fs-fw-aalesund.fortidyndns.com
+      - https://fs-fw-aarhus.fortidyndns.com
+      - https://fs-fw-bergen.fortidyndns.com
+      - https://fs-fw-bodo.fortidyndns.com
+      - https://fs-fw-drammen.fortidyndns.com
+      - https://fs-fw-finland.fortidyndns.com
+      - https://fs-fw-fredrikstad.fortidyndns.com
+      - https://fs-fw-goteborg2.fortidyndns.com
+      - https://fs-fw-hamar.fortidyndns.com
+      - https://fs-fw-haugesund.fortidyndns.com
+      - https://fs-fw-hk-lorenskog.fortidyndns.com:10443
+      - https://fs-fw-klofta.fortidyndns.com
+      - https://fs-fw-krsand.fortidyndns.com:10443
+      - https://fs-fw-krsund.fortidyndns.com
+      - https://fs-fw-orebro.fortidyndns.com
+      - https://fs-fw-roskilde.fortidyndns.com
+      - https://fs-fw-sandefjord.fortidyndns.com
+      - https://fs-fw-stavanger.fortidyndns.com
+      - https://fs-fw-taby.fortidyndns.com
+      - https://fs-fw-tromso.fortidyndns.com
+      - https://fs-fw-trondheim.fortidyndns.com
+      - https://fs-fw-klepp.fortidyndns.com
+      - https://fs-fw-vestberga-ny.fortidyndns.com
+      - https://fs-fw-vestlager.fortidyndns.com
+      - https://fs-fw-middelfart.fortidyndns.com
+    
+    labels:
+      platform: network
+      provider: fortinet
+      prometheus: otel-collector-fortigate
+
+# Additional ScrapeConfigs
+scrapeConfigs:
+  # Azure Resource Manager Exporter ScrapeConfig
+  azureResourceManager:
+    enabled: true
+    name: azure-resource-exporter
+    jobName: azure-resource-exporter
+    metricsPath: /metrics
+    scrapeInterval: 1m
+    scrapeTimeout: 30s
+    target: azure-resourcemanager-exporter.monitoring.svc.cluster.local:8080
+    labels:
+      application: resourcemanager-exporter
+  
+  # Azure Resource Graph Exporter ScrapeConfig (currently disabled)
+  azureResourceGraph:
+    enabled: false
+    name: azure-resourcegraph-exporter
+    jobName: azure-resourcegraph-exporter
+    metricsPath: /metrics
+    scrapeInterval: 1m
+    scrapeTimeout: 30s
+    target: azure-resourcegraph-exporter.monitoring.svc.cluster.local:8080
+    labels:
+      application: resourcegraph-exporter
+
+# Blackbox Exporter configuration
+# This section passes values to the prometheus-community/prometheus-blackbox-exporter chart
+blackboxExporter:
+  enabled: true
+  
+  # Blackbox exporter configuration modules
+  config:
+    modules:
+      http_2xx:
+        timeout: 10s
+        http:
+          valid_status_codes:
+            - 200
+            - 301
+            - 302
+            - 307
+            - 401
+            - 403
+  
+  # Resource limits
+  resources:
+    requests:
+      cpu: 5m
+      memory: 30Mi
+    limits:
+      cpu: 10m
+      memory: 50Mi
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 9115
+    annotations: {}
+  
+  # ScrapeConfig for HTTP endpoint monitoring
+  scrapeConfig:
+    enabled: false  # Set to true to enable endpoint monitoring
+    name: blackbox-http-probe
+    jobName: blackbox-http-exporter
+    metricsPath: /probe
+    scrapeInterval: 30s
+    scrapeTimeout: 10s
+    
+    # Probe module to use (must match a module in config.modules)
+    params:
+      module: [http_2xx]
+    
+    # List of targets to probe (URLs, IPs, etc.)
+    targets:
+      - https://example.com
+      - https://google.com
+      - http://prometheus.io
+    
+    # Additional labels for all targets
+    labels:
+      probe_type: http
+    
+    # Additional relabeling configurations (optional)
+    additionalRelabelings: []
+  
+  # Additional configuration can be added here
+  # For full options, see: https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-blackbox-exporter

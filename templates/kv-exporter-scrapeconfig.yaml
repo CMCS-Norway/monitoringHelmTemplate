@@ -1,0 +1,26 @@
+{{- if and .Values.azureKeyVaultExporter.enabled .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.enabled }}
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: {{ .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.name }}
+  namespace: {{ include "monitoring-stack.namespace" . }}
+  labels:
+    {{- include "monitoring-stack.labels" . | nindent 4 }}
+    {{- include "monitoring-stack.azureLabels" . | nindent 4 }}
+    component: azure-keyvault-exporter
+    scrape: config
+spec:
+  jobName: {{ .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.jobName }}
+  metricsPath: {{ .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.metricsPath }}
+  scrapeInterval: {{ .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.scrapeInterval }}
+  scrapeTimeout: {{ .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.scrapeTimeout }}
+  staticConfigs:
+    - targets:
+        - {{ .Values.azureKeyVaultExporter.fullnameOverride }}.{{ include "monitoring-stack.namespace" . }}.svc.cluster.local:{{ .Values.azureKeyVaultExporter.service.port }}
+      labels:
+        namespace: {{ include "monitoring-stack.namespace" . }}
+        application: kv-exporter
+        customer: {{ .Values.global.customerLabel | quote }}
+        platform: {{ .Values.global.platform }}
+        provider: {{ .Values.global.provider }}
+{{- end }}

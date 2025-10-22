@@ -1,0 +1,20 @@
+{{- if .Values.fortigateExporter.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.fortigateExporter.name }}
+  namespace: {{ include "monitoring-stack.namespace" . }}
+  labels:
+    {{- include "monitoring-stack.labels" . | nindent 4 }}
+    app: {{ .Values.fortigateExporter.name }}
+    component: fortigate-exporter
+spec:
+  type: {{ .Values.fortigateExporter.service.type }}
+  selector:
+    app: {{ .Values.fortigateExporter.name }}
+  ports:
+    - protocol: {{ .Values.fortigateExporter.service.protocol }}
+      port: {{ .Values.fortigateExporter.service.port }}
+      targetPort: {{ .Values.fortigateExporter.service.targetPort }}
+      name: http
+{{- end }}

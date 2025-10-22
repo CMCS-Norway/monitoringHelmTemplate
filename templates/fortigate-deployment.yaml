@@ -1,0 +1,41 @@
+{{- if .Values.fortigateExporter.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.fortigateExporter.name }}
+  namespace: {{ include "monitoring-stack.namespace" . }}
+  labels:
+    {{- include "monitoring-stack.labels" . | nindent 4 }}
+    app: {{ .Values.fortigateExporter.name }}
+    component: fortigate-exporter
+spec:
+  replicas: {{ .Values.fortigateExporter.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.fortigateExporter.name }}
+  template:
+    metadata:
+      labels:
+        {{- include "monitoring-stack.labels" . | nindent 8 }}
+        app: {{ .Values.fortigateExporter.name }}
+        component: fortigate-exporter
+    spec:
+      containers:
+        - name: {{ .Values.fortigateExporter.name }}
+          image: "{{ .Values.fortigateExporter.image.registry }}/{{ .Values.fortigateExporter.image.repository }}:{{ .Values.fortigateExporter.image.tag }}"
+          imagePullPolicy: {{ .Values.fortigateExporter.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.fortigateExporter.containerPort }}
+              protocol: TCP
+              name: metrics
+          volumeMounts:
+            {{- toYaml .Values.fortigateExporter.volumeMounts | nindent 12 }}
+          args:
+            {{- toYaml .Values.fortigateExporter.args | nindent 12 }}
+          resources:
+            {{- toYaml .Values.fortigateExporter.resources | nindent 12 }}
+      volumes:
+        - name: config-volume
+          secret:
+            secretName: {{ .Values.fortigateExporter.externalSecret.targetSecretName }}
+{{- end }}

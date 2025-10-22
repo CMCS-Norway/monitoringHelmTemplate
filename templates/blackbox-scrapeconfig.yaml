@@ -1,0 +1,42 @@
+{{- if and .Values.blackboxExporter.enabled .Values.blackboxExporter.scrapeConfig.enabled }}
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: {{ .Values.blackboxExporter.scrapeConfig.name }}
+  namespace: {{ include "monitoring-stack.namespace" . }}
+  labels:
+    {{- include "monitoring-stack.labels" . | nindent 4 }}
+    component: blackbox-exporter
+    scrape: config
+spec:
+  jobName: {{ .Values.blackboxExporter.scrapeConfig.jobName }}
+  metricsPath: {{ .Values.blackboxExporter.scrapeConfig.metricsPath }}
+  scrapeInterval: {{ .Values.blackboxExporter.scrapeConfig.scrapeInterval }}
+  scrapeTimeout: {{ .Values.blackboxExporter.scrapeConfig.scrapeTimeout }}
+  {{- if .Values.blackboxExporter.scrapeConfig.params }}
+  params:
+    {{- toYaml .Values.blackboxExporter.scrapeConfig.params | nindent 4 }}
+  {{- end }}
+  staticConfigs:
+    - targets:
+        {{- toYaml .Values.blackboxExporter.scrapeConfig.targets | nindent 8 }}
+      {{- if .Values.blackboxExporter.scrapeConfig.labels }}
+      labels:
+        {{- toYaml .Values.blackboxExporter.scrapeConfig.labels | nindent 8 }}
+        namespace: {{ include "monitoring-stack.namespace" . }}
+        customer: {{ .Values.global.customerLabel | quote }}
+      {{- end }}
+  relabelings:
+    # Pass the target as a parameter to the blackbox exporter
+    - sourceLabels: [__address__]
+      targetLabel: __param_target
+    # Set the instance label to the target URL
+    - sourceLabels: [__param_target]
+      targetLabel: instance
+    # Point to the blackbox exporter service
+    - targetLabel: __address__
+      replacement: "prometheus-blackbox-exporter.{{ include "monitoring-stack.namespace" . }}.svc.cluster.local:{{ .Values.blackboxExporter.service.port }}"
+    {{- if .Values.blackboxExporter.scrapeConfig.additionalRelabelings }}
+    {{- toYaml .Values.blackboxExporter.scrapeConfig.additionalRelabelings | nindent 4 }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,36 @@
+{{- if and .Values.fortigateExporter.enabled .Values.fortigateExporter.scrapeConfig.enabled }}
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: {{ .Values.fortigateExporter.scrapeConfig.name }}
+  namespace: {{ include "monitoring-stack.namespace" . }}
+  labels:
+    {{- include "monitoring-stack.labels" . | nindent 4 }}
+    {{- with .Values.fortigateExporter.scrapeConfig.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    customer: {{ .Values.global.customerLabel | quote }}
+    scrape: config
+    component: fortigate-exporter
+spec:
+  jobName: {{ .Values.fortigateExporter.scrapeConfig.jobName }}
+  metricsPath: {{ .Values.fortigateExporter.scrapeConfig.metricsPath }}
+  scrapeInterval: {{ .Values.fortigateExporter.scrapeConfig.scrapeInterval }}
+  scrapeTimeout: {{ .Values.fortigateExporter.scrapeConfig.scrapeTimeout }}
+  staticConfigs:
+    - targets:
+        {{- toYaml .Values.fortigateExporter.scrapeConfig.targets | nindent 8 }}
+      labels:
+        namespace: {{ include "monitoring-stack.namespace" . }}
+        customer: {{ .Values.global.customerLabel | quote }}
+        platform: {{ .Values.fortigateExporter.scrapeConfig.labels.platform }}
+        provider: {{ .Values.fortigateExporter.scrapeConfig.labels.provider }}
+  relabelings:
+    - sourceLabels: [__address__]
+      targetLabel: __param_target
+    - targetLabel: __address__
+      replacement: "{{ .Values.fortigateExporter.name }}.{{ include "monitoring-stack.namespace" . }}.svc.cluster.local:{{ .Values.fortigateExporter.service.port }}"
+    - sourceLabels: [__param_target]
+      targetLabel: hostname
+      regex: "https?://([^:/]+).*"
+{{- end }}
