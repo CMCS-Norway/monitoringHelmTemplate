@@ -1,0 +1,61 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "enabled": true,
+  "timezone": "Europe/Oslo",
+  "schedule": [
+    "before 10am on monday"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "commitMessagePrefix": "chore(deps):",
+  "helm-values": {
+    "enabled": true,
+    "fileMatch": [
+      "Chart\\.yaml$"
+    ]
+  },
+  "helmv3": {
+    "enabled": true,
+    "fileMatch": [
+      "Chart\\.yaml$"
+    ]
+  },
+  "packageRules": [
+    {
+      "matchDatasources": ["helm"],
+      "groupName": "Helm chart dependencies",
+      "automerge": false,
+      "commitMessageTopic": "Helm chart {{depName}}",
+      "schedule": [
+        "before 10am on monday"
+      ]
+    },
+    {
+      "matchPackageNames": [
+        "azure-keyvault-exporter",
+        "azure-resourcemanager-exporter"
+      ],
+      "groupName": "Azure exporters",
+      "automerge": false
+    },
+    {
+      "matchPackageNames": [
+        "prometheus-blackbox-exporter"
+      ],
+      "groupName": "Prometheus exporters",
+      "automerge": false
+    }
+  ],
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 3,
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "security"
+    ]
+  }
+}
