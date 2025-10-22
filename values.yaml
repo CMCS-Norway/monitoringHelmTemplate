@@ -420,8 +420,6 @@ fortigateExporter:
       - https://fs-fw-middelfart.fortidyndns.com
     
     labels:
-      platform: network
-      provider: fortinet
       prometheus: otel-collector-fortigate
 
 # Additional ScrapeConfigs

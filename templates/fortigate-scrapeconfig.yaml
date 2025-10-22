@@ -21,9 +21,6 @@ spec:
         {{- toYaml .Values.fortigateExporter.scrapeConfig.targets | nindent 8 }}
       labels:
         namespace: {{ include "monitoring-stack.namespace" . }}
-        customer: {{ .Values.global.customerLabel | quote }}
-        platform: {{ .Values.fortigateExporter.scrapeConfig.labels.platform }}
-        provider: {{ .Values.fortigateExporter.scrapeConfig.labels.provider }}
   relabelings:
     - sourceLabels: [__address__]
       targetLabel: __param_target
