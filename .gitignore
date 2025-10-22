@@ -1,0 +1,41 @@
+# Helm chart dependencies
+charts/
+*.tgz
+Chart.lock
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+/tmp/
+/temp/
+
+# Rendered templates (for testing)
+/rendered.yaml
+/output/
+
+# Environment-specific values
+values-*.yaml
+!values-dev.yaml.example
+!values-prod.yaml.example
+
+# Secrets (never commit)
+secrets/
+*.key
+*.pem
+*.crt
+*.secret
+
+# CI/CD
+.github/workflows/*.log
+
+# OS
+Thumbs.db
