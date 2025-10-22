@@ -71,6 +71,15 @@ jobs:
         run: |
           helm dependency update
 
+      - name: Update Chart version from tag
+        run: |
+          # Extract version from tag (removes 'v' prefix)
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Setting chart version to $VERSION"
+          # Update Chart.yaml version
+          sed -i "s/^version:.*/version: $VERSION/" Chart.yaml
+          cat Chart.yaml | grep "version:"
+
       - name: Package Helm chart
         run: |
           helm package .

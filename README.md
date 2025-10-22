@@ -21,18 +21,37 @@ This chart manages four monitoring exporters with unified configuration:
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### 1. Add Helm Repository
 
 ```bash
-cd /path/to/monitoringHelmTemplate
-helm dependency update
+# Add the CMCS monitoring Helm repository
+helm repo add cmcs-monitoring https://cmcs-norway.github.io/monitoringHelmTemplate/
+
+# Update repository index
+helm repo update
+
+# Search for available charts
+helm search repo cmcs-monitoring
 ```
 
-This downloads the required webdevops charts (azure-keyvault-exporter, azure-resourcemanager-exporter).
+### 2. Install the Chart
 
-### 2. Configure Values
+```bash
+# Install with default values
+helm install monitoring-stack cmcs-monitoring/monitoring-stack \
+  --namespace monitoring \
+  --create-namespace
 
-Create a custom values file or edit `values.yaml`:
+# Or install with custom values
+helm install monitoring-stack cmcs-monitoring/monitoring-stack \
+  --namespace monitoring \
+  --create-namespace \
+  -f custom-values.yaml
+```
+
+### 3. Configure Values
+
+Create a custom values file (`custom-values.yaml`):
 
 ```yaml
 global:
@@ -64,15 +83,6 @@ blackboxExporter:
         timeout: 10s
         http:
           valid_status_codes: [200, 301, 302]
-```
-
-### 3. Deploy
-
-```bash
-helm install monitoring-stack . \
-  --namespace monitoring \
-  --create-namespace \
-  --wait
 ```
 
 ### 4. Verify
@@ -343,13 +353,13 @@ containerSecurityContext:
 ### Upgrade
 
 ```bash
-# Update dependencies if Chart.yaml changed
-helm dependency update
+# Update Helm repository
+helm repo update
 
-# Upgrade release
-helm upgrade monitoring-stack . \
+# Upgrade to latest version
+helm upgrade monitoring-stack cmcs-monitoring/monitoring-stack \
   --namespace monitoring \
-  --values values-production.yaml
+  --values custom-values.yaml
 ```
 
 ### Rollback
@@ -533,6 +543,29 @@ helm install monitoring-stack . \
 - **Fortigate:** 5 minutes
 - **Blackbox:** On-demand (via Prometheus scrape configs)
 
+## 🤖 Automated Dependency Updates
+
+This chart uses **Renovate** to automatically monitor and update Helm chart dependencies.
+
+### How It Works
+
+- **Schedule:** Every Monday at 9 AM (Oslo time)
+- **Monitors:** `Chart.yaml` dependencies (Azure exporters, Prometheus exporters)
+- **Creates PRs:** Automatic pull requests with updates
+- **Grouped:** Related dependencies updated together
+- **Security:** Vulnerability alerts enabled
+
+### Dependency Groups
+
+1. **Azure Exporters**
+   - `azure-keyvault-exporter`
+   - `azure-resourcemanager-exporter`
+
+2. **Prometheus Exporters**
+   - `prometheus-blackbox-exporter`
+
+Updates are reviewed and tested before being merged.
+
 ## 🤝 Contributing
 
 When making changes:
@@ -541,17 +574,29 @@ When making changes:
 2. Update `HELM_VALUES.md` documentation
 3. Test with `helm lint` and `helm template`
 4. Increment chart version in `Chart.yaml`
+5. Create a new tag to trigger release workflow
 
-## 📝 Migration from Kustomize
+## 📦 Local Development
 
-This chart was converted from a Kustomize-based deployment. The original manifests are preserved in `manifests/` for reference.
+If you want to develop or test changes locally:
 
-To migrate:
+```bash
+# Clone the repository
+git clone https://github.com/CMCS-Norway/monitoringHelmTemplate.git
+cd monitoringHelmTemplate
 
-1. Backup existing deployment: `kubectl get all -n monitoring -o yaml > backup.yaml`
-2. Uninstall Kustomize deployment: `kubectl delete -k .`
-3. Follow Quick Start guide above
-4. Verify all metrics are being collected
+# Update dependencies
+helm dependency update
+
+# Test the chart
+helm lint .
+helm template monitoring-stack . --debug
+
+# Install from local directory
+helm install monitoring-stack . \
+  --namespace monitoring \
+  --create-namespace
+```
 
 ## 📄 License
 
