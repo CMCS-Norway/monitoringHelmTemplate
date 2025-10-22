@@ -463,16 +463,32 @@ kubectl get svc -n monitoring
 
 ## 📚 Documentation
 
-- **[HELM_VALUES.md](./HELM_VALUES.md)** - Complete values reference with all parameters
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Detailed deployment procedures and checklists
-- **[VERIFICATION.md](./VERIFICATION.md)** - Testing and validation procedures
+### Quick Links
 
-## 🗂️ Chart Structure
+- **[Quick Start](#-quick-start)** - Get started in 3 steps
+- **[Configuration Examples](#️-configuration)** - Common use cases
+- **[Troubleshooting](#-troubleshooting)** - Common issues and solutions
+
+### Detailed Guides
+
+- **[HELM_VALUES.md](./docs/HELM_VALUES.md)** - Complete values reference with all parameters
+- **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Detailed deployment procedures and checklists
+- **[VERIFICATION.md](./docs/VERIFICATION.md)** - Testing and validation procedures
+- **[RELEASE_GUIDE.md](./docs/RELEASE_GUIDE.md)** - How to create releases (automated versioning)
+
+## 🗂️ Repository Structure
 
 ```
 monitoringHelmTemplate/
-├── Chart.yaml                      # Chart metadata + dependencies
-├── values.yaml                     # Default configuration
+├── Chart.yaml                           # Chart metadata + dependencies
+├── values.yaml                          # Default configuration
+├── README.md                            # This file
+├── renovate.json                        # Renovate config for dependency updates
+├── docs/                                # Documentation
+│   ├── DEPLOYMENT.md                    # Deployment guide
+│   ├── HELM_VALUES.md                   # Complete values reference
+│   ├── VERIFICATION.md                  # Testing and validation
+│   └── RELEASE_GUIDE.md                 # Release process
 ├── templates/                           # Kubernetes resource templates
 │   ├── _helpers.tpl                     # Template helper functions
 │   ├── NOTES.txt                        # Post-install notes
@@ -486,7 +502,11 @@ monitoringHelmTemplate/
 │   ├── fortigate-scrapeconfig.yaml     # Fortigate ScrapeConfig
 │   ├── blackbox-scrapeconfig.yaml      # Blackbox ScrapeConfig
 │   └── scrapeconfigs.yaml              # Additional ScrapeConfigs
-└── charts/                         # Dependencies (after helm dep update)
+├── .github/
+│   └── workflows/
+│       ├── release.yml                  # Release automation
+│       └── renovate.yml                 # Dependency updates
+└── charts/                              # Dependencies (after helm dep update)
 ```
 
 ## 🔧 Environment-Specific Deployments
@@ -494,20 +514,28 @@ monitoringHelmTemplate/
 ### Development
 
 ```bash
-helm install monitoring-stack . \
+# Add the repository
+helm repo add cmcs-monitoring https://cmcs-norway.github.io/monitoringHelmTemplate/
+helm repo update
+
+# Install with dev values
+helm install monitoring-stack cmcs-monitoring/monitoring-stack \
   -n monitoring-dev \
   --create-namespace \
-  -f values.yaml \
   -f values-dev.yaml
 ```
 
 ### Production
 
 ```bash
-helm install monitoring-stack . \
+# Add the repository
+helm repo add cmcs-monitoring https://cmcs-norway.github.io/monitoringHelmTemplate/
+helm repo update
+
+# Install with production values
+helm install monitoring-stack cmcs-monitoring/monitoring-stack \
   -n monitoring \
   --create-namespace \
-  -f values.yaml \
   -f values-prod.yaml \
   --atomic \
   --timeout 10m
@@ -568,13 +596,31 @@ Updates are reviewed and tested before being merged.
 
 ## 🤝 Contributing
 
-When making changes:
+### Making Changes
 
-1. Update `values.yaml` with new options
-2. Update `HELM_VALUES.md` documentation
-3. Test with `helm lint` and `helm template`
-4. Increment chart version in `Chart.yaml`
-5. Create a new tag to trigger release workflow
+1. Create a feature branch
+2. Make your changes
+3. Update `values.yaml` with new options (if applicable)
+4. Update documentation in `docs/` folder
+5. Test with `helm lint` and `helm template`
+6. Create a pull request
+
+### Creating a Release
+
+See **[RELEASE_GUIDE.md](./docs/RELEASE_GUIDE.md)** for detailed instructions.
+
+Quick version:
+```bash
+# Just create and push a tag - version is automated!
+git tag -a v1.0.1 -m "Release v1.0.1"
+git push origin v1.0.1
+```
+
+The workflow automatically:
+- Updates Chart.yaml version from tag
+- Packages the chart
+- Creates GitHub Release
+- Publishes to Helm repository
 
 ## 📦 Local Development
 
