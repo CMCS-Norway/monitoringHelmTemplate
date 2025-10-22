@@ -9,7 +9,6 @@ metadata:
     {{- with .Values.fortigateExporter.scrapeConfig.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-    customer: {{ .Values.global.customerLabel | quote }}
     scrape: config
     component: fortigate-exporter
 spec:
@@ -29,7 +28,10 @@ spec:
     - sourceLabels: [__address__]
       targetLabel: __param_target
     - targetLabel: __address__
-      replacement: "{{ .Values.fortigateExporter.name }}.{{ include "monitoring-stack.namespace" . }}.svc.cluster.local:{{ .Values.fortigateExporter.service.port }}"
+      replacement: >-
+        {{ .Values.fortigateExporter.name }}.{{
+        include "monitoring-stack.namespace" . }}.svc.cluster.local:{{
+        .Values.fortigateExporter.service.port }}
     - sourceLabels: [__param_target]
       targetLabel: hostname
       regex: "https?://([^:/]+).*"

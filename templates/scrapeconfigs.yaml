@@ -7,7 +7,6 @@ metadata:
   namespace: {{ include "monitoring-stack.namespace" . }}
   labels:
     {{- include "monitoring-stack.labels" . | nindent 4 }}
-    {{- include "monitoring-stack.azureLabels" . | nindent 4 }}
     scrape: config
     component: azure-resourcemanager-exporter
 spec:
@@ -34,7 +33,6 @@ metadata:
   namespace: {{ include "monitoring-stack.namespace" . }}
   labels:
     {{- include "monitoring-stack.labels" . | nindent 4 }}
-    {{- include "monitoring-stack.azureLabels" . | nindent 4 }}
     scrape: config
     component: azure-resourcegraph-exporter
 spec:

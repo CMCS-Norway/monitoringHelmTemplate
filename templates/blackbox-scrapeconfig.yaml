@@ -35,7 +35,10 @@ spec:
       targetLabel: instance
     # Point to the blackbox exporter service
     - targetLabel: __address__
-      replacement: "prometheus-blackbox-exporter.{{ include "monitoring-stack.namespace" . }}.svc.cluster.local:{{ .Values.blackboxExporter.service.port }}"
+      replacement: >-
+        prometheus-blackbox-exporter.{{
+        include "monitoring-stack.namespace" . }}.svc.cluster.local:{{
+        .Values.blackboxExporter.service.port }}
     {{- if .Values.blackboxExporter.scrapeConfig.additionalRelabelings }}
     {{- toYaml .Values.blackboxExporter.scrapeConfig.additionalRelabelings | nindent 4 }}
     {{- end }}

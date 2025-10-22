@@ -32,8 +32,12 @@ data:
       graph:
         scrapeTime: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.graph.scrapeTime }}
         filter:
-          application: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.graph.filter.application | quote }}
-          servicePrincipal: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.graph.filter.servicePrincipal | quote }}
+          application: {{
+            .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.graph.filter.application | quote
+          }}
+          servicePrincipal: {{
+            .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.graph.filter.servicePrincipal | quote
+          }}
       defender:
         scrapeTime: {{ .Values.azureResourceManagerExporter.additionalResources.configMap.data.collectors.defender.scrapeTime }}
       resourceHealth:
