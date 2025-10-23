@@ -150,7 +150,7 @@ jobs:
           cr index \
             --owner CMCS-Norway \
             --git-repo monitoringHelmTemplate \
-            --charts-repo https://cmcs-norway.github.io/monitoringHelmTemplate \
+            --release-name-template "v{{ .Version }}" \
             --index-path .cr-release-packages/index.yaml \
             --package-path .cr-release-packages \
             --push false
