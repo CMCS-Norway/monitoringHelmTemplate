@@ -6,7 +6,6 @@ metadata:
   namespace: {{ include "monitoring-stack.namespace" . }}
   labels:
     {{- include "monitoring-stack.labels" . | nindent 4 }}
-    {{- include "monitoring-stack.azureLabels" . | nindent 4 }}
     component: azure-keyvault-exporter
     scrape: config
 spec:
@@ -20,7 +19,4 @@ spec:
       labels:
         namespace: {{ include "monitoring-stack.namespace" . }}
         application: kv-exporter
-        customer: {{ .Values.global.customerLabel | quote }}
-        platform: {{ .Values.global.platform }}
-        provider: {{ .Values.global.provider }}
 {{- end }}

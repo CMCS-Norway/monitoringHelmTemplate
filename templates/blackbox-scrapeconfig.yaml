@@ -24,7 +24,6 @@ spec:
       labels:
         {{- toYaml .Values.blackboxExporter.scrapeConfig.labels | nindent 8 }}
         namespace: {{ include "monitoring-stack.namespace" . }}
-        customer: {{ .Values.global.customerLabel | quote }}
       {{- end }}
   relabelings:
     # Pass the target as a parameter to the blackbox exporter

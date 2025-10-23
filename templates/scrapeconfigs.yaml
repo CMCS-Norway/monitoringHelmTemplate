@@ -20,9 +20,6 @@ spec:
       labels:
         namespace: {{ include "monitoring-stack.namespace" . }}
         application: {{ .Values.scrapeConfigs.azureResourceManager.labels.application }}
-        customer: {{ .Values.global.customerLabel | quote }}
-        platform: {{ .Values.global.platform }}
-        provider: {{ .Values.global.provider }}
 {{- end }}
 ---
 {{- if .Values.scrapeConfigs.azureResourceGraph.enabled }}
@@ -46,7 +43,4 @@ spec:
       labels:
         namespace: {{ include "monitoring-stack.namespace" . }}
         application: {{ .Values.scrapeConfigs.azureResourceGraph.labels.application }}
-        customer: {{ .Values.global.customerLabel | quote }}
-        platform: {{ .Values.global.platform }}
-        provider: {{ .Values.global.provider }}
 {{- end }}
