@@ -3,6 +3,44 @@ entries:
   monitoring-stack:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2025-10-23T10:28:12.407089501Z"
+    dependencies:
+    - alias: azureKeyVaultExporter
+      condition: azureKeyVaultExporter.enabled
+      name: azure-keyvault-exporter
+      repository: https://webdevops.github.io/helm-charts/
+      version: 1.0.12
+    - alias: azureResourceManagerExporter
+      condition: azureResourceManagerExporter.enabled
+      name: azure-resourcemanager-exporter
+      repository: https://webdevops.github.io/helm-charts/
+      version: 1.3.5
+    - alias: blackboxExporter
+      condition: blackboxExporter.enabled
+      name: prometheus-blackbox-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 11.3.1
+    description: A Helm chart for deploying monitoring exporters (Azure, Network,
+      HTTP probing) with centralized configuration
+    digest: a00c1d3ebb4e298376f351a95f82aafb99d7915424b280ab184a762e89ab742a
+    home: https://github.com/your-org/monitoring-helm-template
+    keywords:
+    - monitoring
+    - prometheus
+    - azure
+    - exporters
+    maintainers:
+    - name: Platform Team
+    name: monitoring-stack
+    sources:
+    - https://github.com/webdevops/helm-charts
+    - https://github.com/prometheus-community/helm-charts
+    type: application
+    urls:
+    - https://github.com/CMCS-Norway/monitoringHelmTemplate/releases/download/v1.0.4/monitoring-stack-1.0.4.tgz
+    version: 1.0.4
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2025-10-23T08:42:39.599199855Z"
     dependencies:
     - alias: azureKeyVaultExporter
@@ -77,4 +115,4 @@ entries:
     urls:
     - https://github.com/CMCS-Norway/monitoringHelmTemplate/releases/download/v1.0.2/monitoring-stack-1.0.2.tgz
     version: 1.0.2
-generated: "2025-10-23T08:42:39.599214983Z"
+generated: "2025-10-23T10:28:12.407105692Z"
