@@ -2,6 +2,26 @@
 
 A production-ready Helm chart for deploying a complete monitoring stack with Azure and network exporters.
 
+> 📖 **[Complete Documentation](./docs/)** | [Values Reference](./docs/HELM_VALUES.md) | [Deployment Guide](./docs/DEPLOYMENT.md) | [Release Guide](./docs/RELEASE_GUIDE.md) | [Verification](./docs/VERIFICATION.md)
+
+## 📑 Table of Contents
+
+- [What This Chart Deploys](#-what-this-chart-deploys)
+- [Prerequisites](#-prerequisites)
+- [Quick Start](#-quick-start)
+- [Architecture](#️-architecture)
+- [Configuration](#️-configuration)
+- [Prometheus Integration](#-prometheus-integration)
+- [Security](#-security)
+- [Management](#-management)
+- [Testing](#-testing)
+- [Troubleshooting](#-troubleshooting)
+- [📚 Documentation](#-documentation)
+- [Repository Structure](#️-repository-structure)
+- [Environment-Specific Deployments](#-environment-specific-deployments)
+- [Contributing](#-contributing)
+- [Local Development](#-local-development)
+
 ## 🎯 What This Chart Deploys
 
 This chart manages four monitoring exporters with unified configuration:
@@ -463,18 +483,24 @@ kubectl get svc -n monitoring
 
 ## 📚 Documentation
 
-### Quick Links
+This README provides a quick overview. For detailed information, see the **[`docs/`](./docs/)** folder:
 
-- **[Quick Start](#-quick-start)** - Get started in 3 steps
-- **[Configuration Examples](#️-configuration)** - Common use cases
+### 📖 Complete Guides
+
+| Document | Description |
+|----------|-------------|
+| **[📘 HELM_VALUES.md](./docs/HELM_VALUES.md)** | Complete values reference with all parameters and examples |
+| **[🚀 DEPLOYMENT.md](./docs/DEPLOYMENT.md)** | Step-by-step deployment procedures and environment-specific checklists |
+| **[✅ VERIFICATION.md](./docs/VERIFICATION.md)** | Testing procedures, validation steps, and health checks |
+| **[🔖 RELEASE_GUIDE.md](./docs/RELEASE_GUIDE.md)** | How to create and manage releases (automated workflow) |
+| **[📝 README.md](./docs/README.md)** | Documentation overview and navigation guide |
+
+### Quick Reference
+
+- **[Quick Start](#-quick-start)** - Get running in 3 steps
+- **[Configuration Examples](#️-configuration)** - Common configuration patterns
 - **[Troubleshooting](#-troubleshooting)** - Common issues and solutions
-
-### Detailed Guides
-
-- **[HELM_VALUES.md](./docs/HELM_VALUES.md)** - Complete values reference with all parameters
-- **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Detailed deployment procedures and checklists
-- **[VERIFICATION.md](./docs/VERIFICATION.md)** - Testing and validation procedures
-- **[RELEASE_GUIDE.md](./docs/RELEASE_GUIDE.md)** - How to create releases (automated versioning)
+- **[Architecture](#️-architecture)** - Chart structure and components
 
 ## 🗂️ Repository Structure
 
@@ -650,13 +676,26 @@ helm install monitoring-stack . \
 
 ## 🆘 Support
 
-For issues or questions:
-- Review the documentation in this repository
-- Check the [webdevops charts documentation](https://github.com/webdevops/helm-charts)
-- Open an issue in your repository
+For issues, questions, or contributions:
+
+1. **Check Documentation**: Review the [docs folder](./docs/) for detailed guides
+2. **Review Examples**: See configuration examples in this README
+3. **Check Dependencies**: Review upstream documentation:
+   - [Azure Exporters (webdevops)](https://github.com/webdevops/helm-charts)
+   - [Prometheus Blackbox Exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-blackbox-exporter)
+4. **Open an Issue**: Create a GitHub issue with details
+
+## 🔗 Related Resources
+
+- **[Helm Documentation](https://helm.sh/docs/)**
+- **[External Secrets Operator](https://external-secrets.io/)**
+- **[Prometheus Operator](https://prometheus-operator.dev/)**
+- **[Fortigate Exporter](https://github.com/CMCS-Norway/fortigate-exporter-image)**
 
 ---
 
-**Chart Version:** 1.0.0  
-**Last Updated:** 2025-10-22  
-**Status:** Production Ready
+**Chart Version:** 1.0.2  
+**Repository:** [CMCS-Norway/monitoringHelmTemplate](https://github.com/CMCS-Norway/monitoringHelmTemplate)  
+**Helm Repository:** `https://cmcs-norway.github.io/monitoringHelmTemplate/`  
+**Last Updated:** 2025-10-23  
+**Status:** ✅ Production Ready
