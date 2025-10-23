@@ -1,8 +1,11 @@
 # Monitoring Stack Helm Chart
 
-A production-ready Helm chart for deploying a complete monitoring stack with Azure and network exporters.
+A production-ready Helm chart for deploying a complete monitoring stack with Azure and network
+exporters.
 
-> 📖 **[Complete Documentation](./docs/)** | [Values Reference](./docs/HELM_VALUES.md) | [Deployment Guide](./docs/DEPLOYMENT.md) | [Release Guide](./docs/RELEASE_GUIDE.md) | [Verification](./docs/VERIFICATION.md)
+> 📖 **[Complete Documentation](./docs/)** | [Values Reference](./docs/HELM_VALUES.md) |
+> [Deployment Guide](./docs/DEPLOYMENT.md) | [Release Guide](./docs/RELEASE_GUIDE.md) |
+> [Verification](./docs/VERIFICATION.md)
 
 ## 📑 Table of Contents
 
@@ -27,8 +30,10 @@ A production-ready Helm chart for deploying a complete monitoring stack with Azu
 This chart manages four monitoring exporters with unified configuration:
 
 - **Azure KeyVault Exporter** - Monitors Azure Key Vaults (certificate expiry, secret access)
-- **Azure Resource Manager Exporter** - Monitors Azure resources (costs, health, security, reservations)
-- **Fortigate Exporter** - Monitors Fortigate firewalls (25+ locations, VPN status, traffic, sessions)
+- **Azure Resource Manager Exporter** - Monitors Azure resources (costs, health, security,
+  reservations)
+- **Fortigate Exporter** - Monitors Fortigate firewalls (25+ locations, VPN status, traffic,
+  sessions)
 - **Blackbox Exporter** - HTTP/HTTPS/TCP/ICMP probing for endpoint monitoring
 
 ## 📋 Prerequisites
@@ -123,6 +128,7 @@ helm status monitoring-stack -n monitoring
 ### Hybrid Chart Structure
 
 - **Dependency Charts** (managed by Helm)
+
   - `azure-keyvault-exporter` v1.0.12 (webdevops)
   - `azure-resourcemanager-exporter` v1.3.5 (webdevops)
   - `prometheus-blackbox-exporter` v11.3.1 (prometheus-community)
@@ -132,13 +138,13 @@ helm status monitoring-stack -n monitoring
 
 ### Resources Created
 
-| Component | Resources |
-|-----------|-----------|
-| **Azure KeyVault** | Deployment, Service, ServiceMonitor, ExternalSecret |
-| **Azure Resource Manager** | Deployment, Service, ConfigMap, ScrapeConfig |
-| **Fortigate** | Deployment, Service, ExternalSecret, ScrapeConfig |
-| **Blackbox** | Deployment, Service, ConfigMap |
-| **Global** | ExternalSecret (azure-config) |
+| Component                  | Resources                                           |
+| -------------------------- | --------------------------------------------------- |
+| **Azure KeyVault**         | Deployment, Service, ServiceMonitor, ExternalSecret |
+| **Azure Resource Manager** | Deployment, Service, ConfigMap, ScrapeConfig        |
+| **Fortigate**              | Deployment, Service, ExternalSecret, ScrapeConfig   |
+| **Blackbox**               | Deployment, Service, ConfigMap                      |
+| **Global**                 | ExternalSecret (azure-config)                       |
 
 **Total:** ~18-20 Kubernetes resources when fully enabled
 
@@ -150,16 +156,16 @@ Each exporter can be independently controlled:
 
 ```yaml
 azureKeyVaultExporter:
-  enabled: true  # Set to false to disable
+  enabled: true # Set to false to disable
 
 azureResourceManagerExporter:
-  enabled: true  # Set to false to disable
+  enabled: true # Set to false to disable
 
 fortigateExporter:
-  enabled: true  # Set to false to disable
+  enabled: true # Set to false to disable
 
 blackboxExporter:
-  enabled: true  # Set to false to disable
+  enabled: true # Set to false to disable
 ```
 
 ### Azure KeyVault Exporter
@@ -168,11 +174,11 @@ blackboxExporter:
 azureKeyVaultExporter:
   enabled: true
   replicas: 1
-  
+
   env:
-    AZURE_SUBSCRIPTION_ID: "sub-id-1 sub-id-2"  # Space-separated
+    AZURE_SUBSCRIPTION_ID: "sub-id-1 sub-id-2" # Space-separated
     KEYVAULT_FILTER: "where tags['monitoring'] == 'true'"
-  
+
   resources:
     limits:
       cpu: 500m
@@ -180,10 +186,10 @@ azureKeyVaultExporter:
     requests:
       cpu: 100m
       memory: 200Mi
-  
+
   prometheus:
     monitor:
-      enabled: true  # Creates ServiceMonitor
+      enabled: true # Creates ServiceMonitor
 ```
 
 ### Azure Resource Manager Exporter
@@ -191,7 +197,7 @@ azureKeyVaultExporter:
 ```yaml
 azureResourceManagerExporter:
   enabled: true
-  
+
   additionalResources:
     configMap:
       enabled: true
@@ -212,7 +218,7 @@ azureResourceManagerExporter:
 ```yaml
 blackboxExporter:
   enabled: true
-  
+
   # Configure probe modules
   config:
     modules:
@@ -220,7 +226,7 @@ blackboxExporter:
         timeout: 10s
         http:
           valid_status_codes: [200, 301, 302, 307, 401, 403]
-      
+
       # Add custom modules as needed
       http_post_2xx:
         prober: http
@@ -228,7 +234,7 @@ blackboxExporter:
         http:
           method: POST
           valid_status_codes: [200, 201]
-  
+
   resources:
     requests:
       cpu: 5m
@@ -236,7 +242,7 @@ blackboxExporter:
     limits:
       cpu: 10m
       memory: 50Mi
-  
+
   # Enable ScrapeConfig for endpoint monitoring
   scrapeConfig:
     enabled: true
@@ -245,10 +251,11 @@ blackboxExporter:
       - https://api.example.com/health
       - http://internal-service.svc.cluster.local:8080
     params:
-      module: [http_2xx]  # Use http_2xx probe module
+      module: [http_2xx] # Use http_2xx probe module
 ```
 
 **Common use cases:**
+
 - HTTP/HTTPS endpoint monitoring
 - SSL certificate expiration checks
 - TCP port availability
@@ -256,6 +263,7 @@ blackboxExporter:
 - DNS resolution validation
 
 **Example: Multi-module probing**
+
 ```yaml
 # Create multiple ScrapeConfigs for different probe types
 blackboxExporter:
@@ -278,19 +286,19 @@ blackboxExporter:
 ```yaml
 fortigateExporter:
   enabled: true
-  
+
   image:
     registry: ghcr.io
     repository: cmcs-norway/fortigate-exporter-image
     tag: "v3.0.0"
-  
+
   replicas: 1
-  
+
   resources:
     limits:
       cpu: 200m
       memory: 256Mi
-  
+
   scrapeConfig:
     enabled: true
     scrapeInterval: 5m
@@ -483,17 +491,18 @@ kubectl get svc -n monitoring
 
 ## 📚 Documentation
 
-This README provides a quick overview. For detailed information, see the **[`docs/`](./docs/)** folder:
+This README provides a quick overview. For detailed information, see the **[`docs/`](./docs/)**
+folder:
 
 ### 📖 Complete Guides
 
-| Document | Description |
-|----------|-------------|
-| **[📘 HELM_VALUES.md](./docs/HELM_VALUES.md)** | Complete values reference with all parameters and examples |
-| **[🚀 DEPLOYMENT.md](./docs/DEPLOYMENT.md)** | Step-by-step deployment procedures and environment-specific checklists |
-| **[✅ VERIFICATION.md](./docs/VERIFICATION.md)** | Testing procedures, validation steps, and health checks |
-| **[🔖 RELEASE_GUIDE.md](./docs/RELEASE_GUIDE.md)** | How to create and manage releases (automated workflow) |
-| **[📝 README.md](./docs/README.md)** | Documentation overview and navigation guide |
+| Document                                           | Description                                                            |
+| -------------------------------------------------- | ---------------------------------------------------------------------- |
+| **[📘 HELM_VALUES.md](./docs/HELM_VALUES.md)**     | Complete values reference with all parameters and examples             |
+| **[🚀 DEPLOYMENT.md](./docs/DEPLOYMENT.md)**       | Step-by-step deployment procedures and environment-specific checklists |
+| **[✅ VERIFICATION.md](./docs/VERIFICATION.md)**   | Testing procedures, validation steps, and health checks                |
+| **[🔖 RELEASE_GUIDE.md](./docs/RELEASE_GUIDE.md)** | How to create and manage releases (automated workflow)                 |
+| **[📝 README.md](./docs/README.md)**               | Documentation overview and navigation guide                            |
 
 ### Quick Reference
 
@@ -570,6 +579,7 @@ helm install monitoring-stack cmcs-monitoring/monitoring-stack \
 ## 📈 Monitoring Capabilities
 
 ### Azure Metrics
+
 - Key Vault certificate expiration
 - Resource health across subscriptions
 - Cost tracking (by subscription, resource group)
@@ -577,6 +587,7 @@ helm install monitoring-stack cmcs-monitoring/monitoring-stack \
 - Reservation utilization
 
 ### Network Metrics
+
 - Fortigate system status
 - VPN connection counts
 - Interface traffic statistics
@@ -585,6 +596,7 @@ helm install monitoring-stack cmcs-monitoring/monitoring-stack \
 - License expiration
 
 ### HTTP/Endpoint Metrics
+
 - HTTP response codes
 - Response times
 - SSL certificate validity
@@ -592,6 +604,7 @@ helm install monitoring-stack cmcs-monitoring/monitoring-stack \
 - TCP connectivity
 
 ### Scrape Intervals
+
 - **Azure KeyVault:** 1 minute
 - **Azure Resources:** 24 hours (configurable per collector)
 - **Fortigate:** 5 minutes
@@ -612,6 +625,7 @@ This chart uses **Renovate** to automatically monitor and update Helm chart depe
 ### Dependency Groups
 
 1. **Azure Exporters**
+
    - `azure-keyvault-exporter`
    - `azure-resourcemanager-exporter`
 
@@ -636,6 +650,7 @@ Updates are reviewed and tested before being merged.
 See **[RELEASE_GUIDE.md](./docs/RELEASE_GUIDE.md)** for detailed instructions.
 
 Quick version:
+
 ```bash
 # Just create and push a tag - version is automated!
 git tag -a v1.0.1 -m "Release v1.0.1"
@@ -643,6 +658,7 @@ git push origin v1.0.1
 ```
 
 The workflow automatically:
+
 - Updates Chart.yaml version from tag
 - Packages the chart
 - Creates GitHub Release
@@ -694,8 +710,9 @@ For issues, questions, or contributions:
 
 ---
 
-**Chart Version:** 1.0.2  
-**Repository:** [CMCS-Norway/monitoringHelmTemplate](https://github.com/CMCS-Norway/monitoringHelmTemplate)  
+**Chart Version:** 1.0.3  
+**Repository:**
+[CMCS-Norway/monitoringHelmTemplate](https://github.com/CMCS-Norway/monitoringHelmTemplate)  
 **Helm Repository:** `https://cmcs-norway.github.io/monitoringHelmTemplate/`  
 **Last Updated:** 2025-10-23  
 **Status:** ✅ Production Ready
