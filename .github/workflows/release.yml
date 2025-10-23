@@ -120,14 +120,20 @@ jobs:
 
       - name: Checkout gh-pages branch
         run: |
+          # Stash any changes from the release process
+          git stash --include-untracked || true
+
+          # Fetch and checkout gh-pages
           git fetch origin gh-pages || git checkout --orphan gh-pages
           git checkout gh-pages || git checkout --orphan gh-pages
 
       - name: Update Helm repository index
         run: |
-          # Download existing packages and index if they exist
+          # Create clean directory for packages
+          rm -rf .cr-release-packages
           mkdir -p .cr-release-packages
 
+          # Copy existing index from gh-pages if it exists
           if [ -f index.yaml ]; then
             cp index.yaml .cr-release-packages/index.yaml
           fi
