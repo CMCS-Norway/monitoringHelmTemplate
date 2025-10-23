@@ -3,7 +3,6 @@
   "extends": ["config:recommended"],
   "enabled": true,
   "timezone": "Europe/Oslo",
-  "schedule": ["before 10am on monday"],
   "labels": ["dependencies"],
   "commitMessagePrefix": "chore(deps):",
   "helm-values": {
@@ -23,10 +22,7 @@
       "schedule": ["before 10am on monday"]
     },
     {
-      "matchPackageNames": [
-        "azure-keyvault-exporter",
-        "azure-resourcemanager-exporter"
-      ],
+      "matchPackageNames": ["azure-keyvault-exporter", "azure-resourcemanager-exporter"],
       "groupName": "Azure exporters",
       "automerge": false
     },
