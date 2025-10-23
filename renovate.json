@@ -1,28 +1,18 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base"
-  ],
+  "extends": ["config:recommended"],
   "enabled": true,
   "timezone": "Europe/Oslo",
-  "schedule": [
-    "before 10am on monday"
-  ],
-  "labels": [
-    "dependencies"
-  ],
+  "schedule": ["before 10am on monday"],
+  "labels": ["dependencies"],
   "commitMessagePrefix": "chore(deps):",
   "helm-values": {
     "enabled": true,
-    "fileMatch": [
-      "Chart\\.yaml$"
-    ]
+    "managerFilePatterns": ["/Chart\\.yaml$/"]
   },
   "helmv3": {
     "enabled": true,
-    "fileMatch": [
-      "Chart\\.yaml$"
-    ]
+    "managerFilePatterns": ["/Chart\\.yaml$/"]
   },
   "packageRules": [
     {
@@ -30,9 +20,7 @@
       "groupName": "Helm chart dependencies",
       "automerge": false,
       "commitMessageTopic": "Helm chart {{depName}}",
-      "schedule": [
-        "before 10am on monday"
-      ]
+      "schedule": ["before 10am on monday"]
     },
     {
       "matchPackageNames": [
@@ -43,9 +31,7 @@
       "automerge": false
     },
     {
-      "matchPackageNames": [
-        "prometheus-blackbox-exporter"
-      ],
+      "matchPackageNames": ["prometheus-blackbox-exporter"],
       "groupName": "Prometheus exporters",
       "automerge": false
     }
@@ -54,8 +40,6 @@
   "prConcurrentLimit": 3,
   "vulnerabilityAlerts": {
     "enabled": true,
-    "labels": [
-      "security"
-    ]
+    "labels": ["security"]
   }
 }
