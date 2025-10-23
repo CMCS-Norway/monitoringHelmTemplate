@@ -162,6 +162,12 @@ jobs:
 
       - name: Commit and push index
         run: |
+          # Pull latest changes to avoid conflicts
+          git pull origin gh-pages --rebase || true
+          
+          # Add and commit the updated index
           git add index.yaml
           git commit -m "Update Helm repository index for v${{ steps.version.outputs.version }}" || echo "No changes to commit"
+          
+          # Push to gh-pages
           git push origin gh-pages
