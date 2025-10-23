@@ -1,30 +1,51 @@
 # Release Guide
 
-This chart uses **automated versioning** - the version in `Chart.yaml` is automatically updated from git tags.
+This chart uses **fully automated releases** - just push a tag and everything happens automatically!
 
-## 🚀 Creating a New Release
+## 🚀 Quick Start: Creating a New Release
 
-### Simple 3-Step Process
+### Option 1: Use the GitHub Actions UI (Recommended)
+
+1. Go to **Actions** tab in GitHub
+2. Click **Prepare Release** workflow
+3. Click **Run workflow**
+4. Enter the version (e.g., `1.0.1`)
+5. Click **Run workflow**
+
+**Done!** The automation will:
+
+- ✅ Update `Chart.yaml` with the new version
+- ✅ Commit the change
+- ✅ Create and push the git tag
+- ✅ Trigger the release workflow automatically
+
+### Option 2: Manual Git Commands
 
 ```bash
-# 1. Make your changes and commit
-git add .
-git commit -m "feat: add new monitoring feature"
+# 1. Update Chart.yaml version manually
+sed -i 's/^version:.*/version: 1.0.1/' Chart.yaml
+
+# 2. Commit and push
+git add Chart.yaml
+git commit -m "chore(release): bump chart version to 1.0.1"
 git push origin main
 
-# 2. Create a version tag (the version you want)
-git tag -a v1.0.1 -m "Release v1.0.1 - Bug fixes and improvements"
-
-# 3. Push the tag (triggers automatic release)
+# 3. Create and push tag
+git tag -a v1.0.1 -m "Release v1.0.1"
 git push origin v1.0.1
 ```
 
-**That's it!** The workflow will:
-- ✅ Extract version from tag (`v1.0.1` → `1.0.1`)
-- ✅ Update `Chart.yaml` automatically
-- ✅ Package chart as `monitoring-stack-1.0.1.tgz`
-- ✅ Create GitHub Release
-- ✅ Publish to Helm repository
+## 🤖 What Happens Automatically
+
+When you push a tag (e.g., `v1.0.1`), the release workflow automatically:
+
+1. **Lints & Tests** the chart
+2. **Updates Chart.yaml** with version from tag
+3. **Updates dependencies** (Azure exporters, Blackbox exporter)
+4. **Packages** the chart as `monitoring-stack-1.0.1.tgz`
+5. **Creates GitHub Release** with release notes and chart package
+6. **Updates gh-pages** branch with new Helm repository index
+7. **Makes chart available** via Helm repository
 
 ## 📋 Version Numbering (Semantic Versioning)
 
@@ -34,33 +55,42 @@ Use semantic versioning for your tags:
 - **Minor** (`v1.0.0` → `v1.1.0`): New features, backward compatible
 - **Major** (`v1.0.0` → `v2.0.0`): Breaking changes
 
-## 🔍 What Happens During Release
+**Important**: Always use the `v` prefix for tags (e.g., `v1.0.1`, not `1.0.1`)
+
+## 🔍 Release Workflow Diagram
 
 ```mermaid
-graph LR
-    A[Push tag v1.0.1] --> B[Workflow triggered]
-    B --> C[Extract version: 1.0.1]
-    C --> D[Update Chart.yaml]
-    D --> E[Package chart]
-    E --> F[Create GitHub Release]
-    F --> G[Publish to Helm repo]
+graph TB
+    A[Push tag v1.0.1] --> B[Lint & Test Job]
+    B --> C{Tests Pass?}
+    C -->|Yes| D[Release Job]
+    C -->|No| E[❌ Stop]
+    D --> F[Extract version: 1.0.1]
+    F --> G[Update Chart.yaml]
+    G --> H[Package chart]
+    H --> I[Create GitHub Release]
+    I --> J[Update gh-pages]
+    J --> K[✅ Chart Available]
 ```
 
 ## ⚡ Quick Release Commands
 
 ### Patch Release (Bug Fixes)
+
 ```bash
 git tag -a v1.0.1 -m "Release v1.0.1"
 git push origin v1.0.1
 ```
 
 ### Minor Release (New Features)
+
 ```bash
 git tag -a v1.1.0 -m "Release v1.1.0 - New exporters added"
 git push origin v1.1.0
 ```
 
 ### Major Release (Breaking Changes)
+
 ```bash
 git tag -a v2.0.0 -m "Release v2.0.0 - Breaking: New configuration structure"
 git push origin v2.0.0
@@ -69,6 +99,7 @@ git push origin v2.0.0
 ## 🔄 Release Workflow
 
 1. **Development**
+
    ```bash
    git checkout -b feature/new-exporter
    # Make changes
@@ -77,11 +108,13 @@ git push origin v2.0.0
    ```
 
 2. **Merge to Main** (via PR)
+
    ```bash
    # PR is reviewed and merged
    ```
 
 3. **Create Release**
+
    ```bash
    git checkout main
    git pull origin main
@@ -141,6 +174,7 @@ Before creating a tag:
 ## 🤖 Automated Processes
 
 What's automated:
+
 - ✅ Chart.yaml version update
 - ✅ Chart packaging
 - ✅ GitHub Release creation
@@ -148,6 +182,7 @@ What's automated:
 - ✅ Dependency updates (via Renovate)
 
 What requires manual action:
+
 - ⚠️ Deciding version number
 - ⚠️ Creating git tag
 - ⚠️ Writing release notes

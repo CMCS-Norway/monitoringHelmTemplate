@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+bower_components/
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# Infrastructure
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Git
+.git/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Specific files that shouldn't be formatted
+*.lock
+*.sum
+Chart.lock
+cluster/apps/misp/manifests/secrets.yml
+
+# Generated files
+*.generated.*
