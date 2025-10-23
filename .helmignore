@@ -37,3 +37,19 @@ manifests/
 # Documentation
 OWNERS
 CONTRIBUTING.md
+docs/
+README.md
+
+# Renovate
+renovate.json
+
+# Chart releaser binaries and archives (from GitHub Actions)
+*.tar.gz
+chart-releaser*
+cr
+
+# Release packages directory
+.cr-release-packages/
+
+# Helm repository index (only for gh-pages branch)
+index.yaml
