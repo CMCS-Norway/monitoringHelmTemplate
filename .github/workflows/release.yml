@@ -165,8 +165,14 @@ jobs:
 
       - name: Commit and push index
         run: |
+          # Stash any uncommitted changes before pulling
+          git stash --include-untracked || true
+          
           # Pull latest changes to avoid conflicts
           git pull origin gh-pages --rebase || true
+          
+          # Restore stashed changes
+          git stash pop || true
 
           # Add and commit the updated index
           git add index.yaml
