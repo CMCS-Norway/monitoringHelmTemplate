@@ -453,6 +453,9 @@ scrapeConfigs:
 blackboxExporter:
   enabled: true
   
+  # Force lowercase naming to comply with Kubernetes naming rules
+  fullnameOverride: "blackbox-exporter"
+  
   # Blackbox exporter configuration modules
   config:
     modules:
