@@ -2,38 +2,60 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.fortigateExporter.name }}
+  name: {{ .Values.fortigateExporter.name | default "fortigate-exporter" }}
   namespace: {{ include "monitoring-stack.namespace" . }}
   labels:
     {{- include "monitoring-stack.labels" . | nindent 4 }}
-    app: {{ .Values.fortigateExporter.name }}
+    app: {{ .Values.fortigateExporter.name | default "fortigate-exporter" }}
     component: fortigate-exporter
 spec:
-  replicas: {{ .Values.fortigateExporter.replicas }}
+  replicas: {{ .Values.fortigateExporter.replicas | default 1 }}
   selector:
     matchLabels:
-      app: {{ .Values.fortigateExporter.name }}
+      app: {{ .Values.fortigateExporter.name | default "fortigate-exporter" }}
   template:
     metadata:
       labels:
         {{- include "monitoring-stack.labels" . | nindent 8 }}
-        app: {{ .Values.fortigateExporter.name }}
+        app: {{ .Values.fortigateExporter.name | default "fortigate-exporter" }}
         component: fortigate-exporter
     spec:
       containers:
-        - name: {{ .Values.fortigateExporter.name }}
-          image: "{{ .Values.fortigateExporter.image.registry }}/{{ .Values.fortigateExporter.image.repository }}:{{ .Values.fortigateExporter.image.tag }}"
-          imagePullPolicy: {{ .Values.fortigateExporter.image.pullPolicy }}
+        - name: {{ .Values.fortigateExporter.name | default "fortigate-exporter" }}
+          image: "{{ dig "image" "registry" "ghcr.io" .Values.fortigateExporter }}/{{ dig "image" "repository" "cmcs-norway/fortigate-exporter-image" .Values.fortigateExporter }}:{{ dig "image" "tag" "v3.0.0" .Values.fortigateExporter }}"
+          imagePullPolicy: {{ dig "image" "pullPolicy" "IfNotPresent" .Values.fortigateExporter }}
           ports:
-            - containerPort: {{ .Values.fortigateExporter.containerPort }}
+            - containerPort: {{ .Values.fortigateExporter.containerPort | default 9710 }}
               protocol: TCP
               name: metrics
           volumeMounts:
+            {{- if .Values.fortigateExporter.volumeMounts }}
             {{- toYaml .Values.fortigateExporter.volumeMounts | nindent 12 }}
+            {{- else }}
+            - mountPath: /config/fortigate-key.yaml
+              subPath: "fortigate-key.yaml"
+              name: config-volume
+              readOnly: true
+            {{- end }}
           args:
+            {{- if .Values.fortigateExporter.args }}
             {{- toYaml .Values.fortigateExporter.args | nindent 12 }}
+            {{- else }}
+            - "-auth-file"
+            - "/config/fortigate-key.yaml"
+            - "-insecure"
+            {{- end }}
           resources:
+            {{- if .Values.fortigateExporter.resources }}
             {{- toYaml .Values.fortigateExporter.resources | nindent 12 }}
+            {{- else }}
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 200m
+            {{- end }}
       volumes:
         - name: config-volume
           secret:

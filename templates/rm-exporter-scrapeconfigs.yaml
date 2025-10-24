@@ -1,0 +1,31 @@
+{{- if .Values.scrapeConfigs }}
+{{- if .Values.scrapeConfigs.azureResourceManager }}
+{{- if .Values.scrapeConfigs.azureResourceManager.enabled | default true }}
+---
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: {{ .Values.scrapeConfigs.azureResourceManager.name | default "azure-resource-exporter" }}
+  namespace: {{ include "monitoring-stack.namespace" . }}
+  labels:
+    {{- include "monitoring-stack.labels" . | nindent 4 }}
+    scrape: config
+    component: azure-resourcemanager-exporter
+spec:
+  jobName: {{ .Values.scrapeConfigs.azureResourceManager.jobName | default "azure-resource-exporter" }}
+  metricsPath: {{ .Values.scrapeConfigs.azureResourceManager.metricsPath | default "/metrics" }}
+  scrapeInterval: {{ .Values.scrapeConfigs.azureResourceManager.scrapeInterval | default "1m" }}
+  scrapeTimeout: {{ .Values.scrapeConfigs.azureResourceManager.scrapeTimeout | default "30s" }}
+  staticConfigs:
+    - targets:
+        - {{ .Values.azureResourceManagerExporter.fullnameOverride }}.{{ include "monitoring-stack.namespace" . }}.svc.cluster.local:{{ .Values.azureResourceManagerExporter.service.port }}
+      labels:
+        namespace: {{ include "monitoring-stack.namespace" . }}
+        application: {{ dig "labels" "application" "resourcemanager-exporter" .Values.scrapeConfigs.azureResourceManager }}
+        customer: {{ .Values.global.customerLabel | quote }}
+        platform: {{ .Values.global.platform }}
+        provider: {{ .Values.global.provider }}
+{{- end }}
+{{- end }}
+{{- end }}
+

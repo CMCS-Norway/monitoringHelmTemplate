@@ -1,8 +1,0 @@
-{{- if and .Values.fortigateExporter.enabled .Values.fortigateExporter.externalSecret.enabled }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ include "monitoring-stack.namespace" . }}
-  labels:
-    {{- include "monitoring-stack.labels" . | nindent 4 }}
-{{- end }}

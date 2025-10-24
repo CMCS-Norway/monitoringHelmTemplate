@@ -2,19 +2,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.fortigateExporter.name }}
+  name: {{ .Values.fortigateExporter.name | default "fortigate-exporter" }}
   namespace: {{ include "monitoring-stack.namespace" . }}
   labels:
     {{- include "monitoring-stack.labels" . | nindent 4 }}
-    app: {{ .Values.fortigateExporter.name }}
+    app: {{ .Values.fortigateExporter.name | default "fortigate-exporter" }}
     component: fortigate-exporter
 spec:
-  type: {{ .Values.fortigateExporter.service.type }}
+  type: {{ dig "service" "type" "ClusterIP" .Values.fortigateExporter }}
   selector:
-    app: {{ .Values.fortigateExporter.name }}
+    app: {{ .Values.fortigateExporter.name | default "fortigate-exporter" }}
   ports:
-    - protocol: {{ .Values.fortigateExporter.service.protocol }}
-      port: {{ .Values.fortigateExporter.service.port }}
-      targetPort: {{ .Values.fortigateExporter.service.targetPort }}
+    - protocol: {{ dig "service" "protocol" "TCP" .Values.fortigateExporter }}
+      port: {{ dig "service" "port" 80 .Values.fortigateExporter }}
+      targetPort: {{ dig "service" "targetPort" 9710 .Values.fortigateExporter }}
       name: http
 {{- end }}

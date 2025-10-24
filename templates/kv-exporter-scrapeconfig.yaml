@@ -1,22 +1,29 @@
-{{- if and .Values.azureKeyVaultExporter.enabled .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.enabled }}
+{{- if .Values.azureKeyVaultExporter }}
+{{- if .Values.azureKeyVaultExporter.enabled }}
+{{- if dig "additionalResources" "scrapeConfig" "enabled" true .Values.azureKeyVaultExporter }}
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
 metadata:
-  name: {{ .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.name }}
+  name: {{ dig "additionalResources" "scrapeConfig" "name" "azure-keyvault-exporter" .Values.azureKeyVaultExporter }}
   namespace: {{ include "monitoring-stack.namespace" . }}
   labels:
     {{- include "monitoring-stack.labels" . | nindent 4 }}
     component: azure-keyvault-exporter
     scrape: config
 spec:
-  jobName: {{ .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.jobName }}
-  metricsPath: {{ .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.metricsPath }}
-  scrapeInterval: {{ .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.scrapeInterval }}
-  scrapeTimeout: {{ .Values.azureKeyVaultExporter.additionalResources.scrapeConfig.scrapeTimeout }}
+  jobName: {{ dig "additionalResources" "scrapeConfig" "jobName" "azure-kv-exporter" .Values.azureKeyVaultExporter }}
+  metricsPath: {{ dig "additionalResources" "scrapeConfig" "metricsPath" "/metrics" .Values.azureKeyVaultExporter }}
+  scrapeInterval: {{ dig "additionalResources" "scrapeConfig" "scrapeInterval" "1m" .Values.azureKeyVaultExporter }}
+  scrapeTimeout: {{ dig "additionalResources" "scrapeConfig" "scrapeTimeout" "30s" .Values.azureKeyVaultExporter }}
   staticConfigs:
     - targets:
         - {{ .Values.azureKeyVaultExporter.fullnameOverride }}.{{ include "monitoring-stack.namespace" . }}.svc.cluster.local:{{ .Values.azureKeyVaultExporter.service.port }}
       labels:
         namespace: {{ include "monitoring-stack.namespace" . }}
         application: kv-exporter
+        customer: {{ .Values.global.customerLabel | quote }}
+        platform: {{ .Values.global.platform }}
+        provider: {{ .Values.global.provider }}
+{{- end }}
+{{- end }}
 {{- end }}

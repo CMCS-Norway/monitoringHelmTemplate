@@ -21,15 +21,18 @@ spec:
         {{- toYaml .Values.fortigateExporter.scrapeConfig.targets | nindent 8 }}
       labels:
         namespace: {{ include "monitoring-stack.namespace" . }}
+        customer: {{ .Values.global.customerLabel | quote }}
+        platform: {{ .Values.global.platform }}
+        provider: {{ .Values.global.provider }}
   relabelings:
-    - sourceLabels: [__address__]
+    - action: replace
+      sourceLabels: [__address__]
       targetLabel: __param_target
-    - targetLabel: __address__
-      replacement: >-
-        {{ .Values.fortigateExporter.name }}.{{
-        include "monitoring-stack.namespace" . }}.svc.cluster.local:{{
-        .Values.fortigateExporter.service.port }}
-    - sourceLabels: [__param_target]
+    - action: replace
+      targetLabel: __address__
+      replacement: {{ .Values.fortigateExporter.name | default "fortigate-exporter" }}.{{ include "monitoring-stack.namespace" . }}.svc.cluster.local:{{ dig "service" "port" 80 .Values.fortigateExporter }}
+    - action: replace
+      sourceLabels: [__param_target]
       targetLabel: hostname
       regex: "https?://([^:/]+).*"
 {{- end }}

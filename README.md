@@ -710,7 +710,7 @@ For issues, questions, or contributions:
 
 ---
 
-**Chart Version:** 1.0.3  
+**Chart Version:** 1.0.7  
 **Repository:**
 [CMCS-Norway/monitoringHelmTemplate](https://github.com/CMCS-Norway/monitoringHelmTemplate)  
 **Helm Repository:** `https://cmcs-norway.github.io/monitoringHelmTemplate/`  
