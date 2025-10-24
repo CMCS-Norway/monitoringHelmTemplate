@@ -2,7 +2,7 @@ apiVersion: v2
 name: monitoring-stack
 description: A Helm chart for deploying monitoring exporters (Azure, Network, HTTP probing) with centralized configuration
 type: application
-version: 1.0.0
+version: 1.0.7
 appVersion: "1.0"
 keywords:
   - monitoring
