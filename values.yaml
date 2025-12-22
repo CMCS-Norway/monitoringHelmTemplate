@@ -229,7 +229,7 @@ azureResourceManagerExporter:
   image:
     registry: docker.io
     repository: webdevops/azure-resourcemanager-exporter
-    tag: "25.5.1"
+    tag: "25.12.1"
   
   env:
     AZURE_ENVIRONMENT: AZUREPUBLICCLOUD
