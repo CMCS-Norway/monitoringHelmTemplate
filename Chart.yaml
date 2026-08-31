@@ -27,7 +27,7 @@ dependencies:
     condition: azureResourceManagerExporter.enabled
     alias: azureResourceManagerExporter
   - name: prometheus-blackbox-exporter
-    version: 11.3.1
+    version: 11.18.0
     repository: https://prometheus-community.github.io/helm-charts
     condition: blackboxExporter.enabled
     alias: blackboxExporter
